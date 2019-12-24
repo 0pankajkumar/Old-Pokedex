@@ -16,6 +16,7 @@ collection = database["pokedexDB"]
 
 
 def getAllPokemons():
+    # Fetches all Pokemons & sends only things which are most important
     apiPok = "https://5n6ugc33m6.execute-api.us-east-1.amazonaws.com/api/pokedex"
     r = requests.get(
         url=apiPok)
@@ -33,11 +34,11 @@ def getAllPokemons():
 def createNewCategoryInDB():
     # Get last category number
     results = collection.find({})
-
     for k in results[0]["data"]["new"].keys():
         cat = k
     cat = [int(s) for s in re.findall(r'-?\d+\.?\d*', cat)][0]
 
+    # Update collection
     collection.update_one(
         {"user": "user1"},
         {"$set": {f"data.new.category{cat+1}": []}}
@@ -51,11 +52,26 @@ def index():
     return jsonify(r)
 
 
-@app.route('/createNewCategory')
+@app.route('/createNewCategory', methods=['POST'])
 def createNewCategory():
     createNewCategoryInDB()
     # return render_template('index.html', things=things)
     return jsonify("success")
+
+
+@app.route('/addToCategory', methods=['POST'])
+def addToCategory():
+    # This method adds list for new Categories
+    # & copies old items in old section
+
+    # Receiving data
+    user = request.values.get('userx')
+    category = request.values.get('categoryx')
+    categoryItems = request.values.getlist('categoryItems[]')
+
+    print(user, category, categoryItems)
+    # return render_template('index.html', things=things)
+    return jsonify(user, category, categoryItems)
 
 
 if __name__ == '__main__':
