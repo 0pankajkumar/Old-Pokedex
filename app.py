@@ -59,10 +59,13 @@ def createNewCategory():
     return jsonify("success")
 
 
-@app.route('/addToCategory', methods=['POST'])
+@app.route('/addToCategory', methods=['GET', 'POST'])
 def addToCategory():
     # This method adds list for new Categories
     # & copies old items in old section
+
+    if request.method == 'GET':
+        return render_template("addToCat.html")
 
     # Receiving data
     user = request.values.get('userx')
