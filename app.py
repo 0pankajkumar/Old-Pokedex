@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, jsonify, \
-    url_for, flash
-
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+import requests
+import json
 
 app = Flask(__name__)
 
@@ -9,11 +9,26 @@ app = Flask(__name__)
 # engine = create_engine('sqlite:///flaskstarter.db')
 # Base.metadata.bind = engine
 
+def getAllPokemons():
+    apiPok = "https://5n6ugc33m6.execute-api.us-east-1.amazonaws.com/api/pokedex"
+    r = requests.get(
+        url=apiPok)
+    json_data = json.loads(r.text)
+
+    final_json_data = list()
+    for j in json_data:
+        t = dict()
+        t["name"] = j["name"]
+        t["id"] = j["id"]
+        final_json_data.append(t)
+    return final_json_data
+
 
 @app.route('/')
 def index():
-    things = ["thing1", "thing2", "cat-in-the-hat"]
-    return render_template('index.html', things=things)
+    r = getAllPokemons()
+    # return render_template('index.html', things=things)
+    return jsonify(r)
 
 
 if __name__ == '__main__':
