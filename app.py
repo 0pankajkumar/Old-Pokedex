@@ -72,6 +72,24 @@ def addToCategory():
     category = request.values.get('categoryx')
     categoryItems = request.values.getlist('categoryItems[]')
 
+    # Transfering categories from `new` to `old` f"user.data.new.{category}"
+    result = collection.find({"user": user})
+    for res in result:
+        old_cat_extracted = res["data"]["new"][category]
+        break
+
+    # Updating old record
+    collection.update_one(
+        {"user": user},
+        {"$set": {f"data.old.{category}": old_cat_extracted}}
+    )
+
+    # Adding to specific category of DB
+    collection.update_one(
+        {"user": user},
+        {"$set": {f"data.new.{category}": categoryItems}}
+    )
+
     print(user, category, categoryItems)
     # return render_template('index.html', things=things)
     return jsonify(user, category, categoryItems)
