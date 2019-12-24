@@ -11,7 +11,8 @@ database = client["local"]
 collection = database["pokedexDB"]
 
 u = {
-    "user1": {
+    "user": "user1",
+    "data": {
         "new": {
             "category1": [],
             "category2": []

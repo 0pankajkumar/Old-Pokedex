@@ -1,13 +1,19 @@
+from bson.int64 import Int64
+from bson import json_util, ObjectId
+from pymongo import MongoClient, CursorType, ASCENDING, DESCENDING
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
 import requests
 import json
+import re
 
 app = Flask(__name__)
 
 
-# Connect to database and create database session
-# engine = create_engine('sqlite:///flaskstarter.db')
-# Base.metadata.bind = engine
+# DB links for pokedexDB collection
+client = MongoClient("mongodb://localhost:27017")
+database = client["local"]
+collection = database["pokedexDB"]
+
 
 def getAllPokemons():
     apiPok = "https://5n6ugc33m6.execute-api.us-east-1.amazonaws.com/api/pokedex"
@@ -24,11 +30,32 @@ def getAllPokemons():
     return final_json_data
 
 
+def createNewCategoryInDB():
+    # Get last category number
+    results = collection.find({})
+
+    for k in results[0]["data"]["new"].keys():
+        cat = k
+    cat = [int(s) for s in re.findall(r'-?\d+\.?\d*', cat)][0]
+
+    collection.update_one(
+        {"user": "user1"},
+        {"$set": {f"data.new.category{cat+1}": []}}
+    )
+
+
 @app.route('/')
 def index():
     r = getAllPokemons()
     # return render_template('index.html', things=things)
     return jsonify(r)
+
+
+@app.route('/createNewCategory')
+def createNewCategory():
+    createNewCategoryInDB()
+    # return render_template('index.html', things=things)
+    return jsonify("success")
 
 
 if __name__ == '__main__':
