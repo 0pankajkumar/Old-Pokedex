@@ -20,7 +20,7 @@ Flask==1.0.2
 Flask-Login==0.4.1
 Flask-Session==0.3.1
 Flask-Uploads==0.2.1
-httplib2==0.13.1
+httplib2==0.18.0
 idna==2.8
 ipykernel==5.1.1
 ipython==7.6.1
